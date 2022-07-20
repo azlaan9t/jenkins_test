@@ -25,6 +25,7 @@ workflows:
   version: 2
   build-test-deploy:
     jobs:
+      - flutter_doctor
       - android_job:
           requires:
             - flutter_doctor
