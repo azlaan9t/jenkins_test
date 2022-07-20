@@ -26,6 +26,8 @@ pipeline {
         }
         stage('BUILD') {
             steps {
+                sh "fvm flutter clean"
+                sh "fvm flutter pub get"
                 sh '''
                   #!/bin/sh
                   fvm flutter build apk --debug
