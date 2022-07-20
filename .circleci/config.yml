@@ -7,8 +7,7 @@ jobs:
     executor:
       name: android/android-machine
     steps:
-      - flutter/install_sdk_and_pub:
-          version: 2.2.3
+      - flutter/install_sdk_and_pub
       - flutter/install_android_gradle
       - flutter/install_android_gem
       - checkout
@@ -23,8 +22,7 @@ jobs:
     macos:
       xcode: 12.5.1
     steps:
-      - flutter/install_sdk_and_pub:
-          version: 2.2.3
+      - flutter/install_sdk_and_pub
       - flutter/install_ios_pod
       - flutter/install_ios_gem
       - run:
