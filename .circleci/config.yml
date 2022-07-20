@@ -14,9 +14,6 @@ jobs:
       - run:
           name: "Build Android"
           command: "flutter -v build apk"
-      - run:
-          name: "Build IOS"
-          command: "flutter -v build ios"
 #      - run: flutter doctor
 #      - run: flutter test
 #      - run: flutter -v build apk
