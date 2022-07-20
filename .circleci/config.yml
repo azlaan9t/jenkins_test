@@ -5,6 +5,19 @@ jobs:
       - image: cirrusci/flutter
     steps:
       - checkout
-      - run: flutter doctor
-      - run: flutter test
-      - run: flutter -v build apk
+      - run:
+          name: "Flutter Doctor"
+          command: "flutter doctor"
+      - run:
+          name: "Testing"
+          command: "flutter test"
+      - run:
+          name: "Build Android"
+          command: "flutter -v build apk"
+      - run:
+          name: "Build IOS"
+          command: "flutter -v build ios"
+#      - run: flutter doctor
+#      - run: flutter test
+#      - run: flutter -v build apk
+#      - run: flutter -v build ios
