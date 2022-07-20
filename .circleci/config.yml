@@ -20,33 +20,11 @@ jobs:
 
   ios_job:
     macos:
-      xcode: 12.5.1
+      xcode: 13.3.1
     steps:
-      - checkout:
-          path: ~/flutter-app
-      - restore_cache:
-          key: bundle-v2-{{ checksum "ios/Gemfile" }}-{{ arch }}
-      - run:
-          name: Setup environment variables
-          command: echo 'export PATH="$PATH:`pwd`/flutter/bin"'  >> $BASH_ENV
-      - run:
-          name: Download flutter SDK
-          command: if ! test -f "flutter_sdk.zip"; then curl -o flutter_sdk.zip https://storage.googleapis.com/flutter_infra/releases/stable/macos/flutter_macos_v1.9.1+hotfix.4-stable.zip; fi
-      - run:
-          name: Unzip flutter SDK
-          command: unzip flutter_sdk.zip
-      - run:
-          name: Checking xcode version
-          command: xcodebuild -version
-      - run:
-          name: Set xcode path
-          command: sudo xcode-select -s /Applications/Xcode-10.3.app/Contents/Developer
-      - run:
-          name: Checking xcode path
-          command: xcode-select -p
-      - run: flutter upgrade
-      - run:
-          command: flutter pub get
+      - flutter/install_sdk
+      - checkout
+
 
   flutter_doctor:
     docker:
@@ -61,4 +39,4 @@ workflows:
   version: 2
   build-test-deploy:
     jobs:
-      - ios_job
+      - android_job
