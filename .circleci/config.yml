@@ -1,4 +1,14 @@
 version: 2
+machine:
+  environment:
+    ANDROID_HOME: "/usr/local/share/android-sdk"
+    ANDROID_SDK_HOME: "/usr/local/share/android-sdk"
+    ANDROID_SDK_ROOT: "/usr/local/share/android-sdk"
+dependencies:
+  override:
+    - brew tap caskroom/cask
+    - brew tap caskroom/versions
+    - brew cask install android-sdk
 jobs:
   build:
     docker:
