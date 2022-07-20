@@ -30,6 +30,10 @@ pipeline {
                   #!/bin/sh
                   fvm flutter build apk --debug
                   '''
+                sh '''
+                  #!/bin/sh
+                  fvm flutter build ios --profile
+                  '''
             }
         }
     }
