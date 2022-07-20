@@ -15,6 +15,7 @@ jobs:
   ios_job:
     macos:
       xcode: 12.5.1
+    working_directory: ~/flutter-app
     steps:
       - checkout
       - run:
