@@ -14,7 +14,7 @@ pipeline {
         }
         stage('TEST') {
             steps {
-                sh 'flutter test'
+                sh "flutter test"
             }
         }
         stage('BUILD') {
