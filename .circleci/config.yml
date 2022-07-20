@@ -1,29 +1,31 @@
 version: 2
+orbs:
+  android: circleci/android@1.0.3
+  flutter: circleci/flutter@1.0
 jobs:
   android_job:
-    docker:
-      - image: cirrusci/flutter
+    executor:
+      name: android/android-machine
     steps:
-      - checkout
+      - flutter/install_sdk_and_pub:
+          version: 2.2.3
+      - flutter/install_android_gradle
+      - flutter/install_android_gem
       - run:
-          name: "Flutter Doctor"
-          command: "flutter doctor"
-      - run:
-          name: "Pub Get"
-          command: "flutter pub get"
+          command: bundle exec fastlane distribute
+          working_directory: ios
 
   ios_job:
     macos:
       xcode: 12.5.1
-    working_directory: ~/flutter-app
     steps:
-      - checkout
+      - flutter/install_sdk_and_pub:
+          version: 2.2.3
+      - flutter/install_ios_pod
+      - flutter/install_ios_gem
       - run:
-          name: "Flutter Doctor"
-          command: "flutter doctor"
-      - run:
-          name: "Pub Get"
-          command: "flutter pub get"
+          command: bundle exec fastlane distribute
+          working_directory: ios
 
   flutter_doctor:
     docker:
