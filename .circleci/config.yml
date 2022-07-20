@@ -1,20 +1,157 @@
-version: 2
+version: 2.1
 jobs:
-  build:
+  ios_distribute_beta:
+    macos:
+      xcode: "10.3.0"
+    working_directory: ~/flutter-app
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab:ab"
+      - checkout:
+          path: ~/flutter-app
+      - restore_cache:
+          key: bundle-v2-{{ checksum "ios/Gemfile" }}-{{ arch }}
+      - run:
+          name: Setup environment variables
+          command: echo 'export PATH="$PATH:`pwd`/flutter/bin"'  >> $BASH_ENV
+      - run:
+          name: Download flutter SDK
+          command: if ! test -f "flutter_sdk.zip"; then curl -o flutter_sdk.zip https://storage.googleapis.com/flutter_infra_release/releases/stable/macos/flutter_macos_arm64_3.0.5-stable.zip; fi
+      - run:
+          name: Unzip flutter SDK
+          command: unzip flutter_sdk.zip
+      - run:
+          name: Checking xcode version
+          command: xcodebuild -version
+      - run:
+          name: Set xcode path
+          command: sudo xcode-select -s /Applications/Xcode-13.4.1.app/Contents/Developer
+      - run:
+          name: Checking xcode path
+          command: xcode-select -p
+      - run: flutter upgrade
+      - run:
+          command: flutter pub get
+      - run:
+          command: bundle install
+          working_directory: ios
+      - run:
+          name: Install CocoaPods Version
+          command: sudo gem install cocoapods
+      - run:
+          working_directory: ios
+          command: pod setup
+      - run:
+          name: Run pod install
+          working_directory: ios
+          command: pod install
+      - run:
+          name: Update CocoaPods
+          working_directory: ios
+          command: pod update
+      - save_cache:
+          key: bundle-v2-{{ checksum "ios/Gemfile" }}-{{ arch }}
+          paths:
+            - vendor/bundle
+      - run:
+          name: Flutter doctor
+          command: flutter doctor
+      - run:
+          command: rm -rf ios/Flutter/Flutter.framework
+      - run:
+          command: flutter clean
+      - run:
+          command: flutter build ios --release --no-codesign --verbose
+          no_output_timeout: 20m
+      - store_artifacts:
+          path: ios/build
+
+  android_distribute_beta:
+    docker:
+      - image: cirrusci/flutter
+    working_directory: ~/flutter-app
+    steps:
+      - checkout:
+          path: ~/flutter-app
+      - run: flutter pub get
+      - run:
+          name: Flutter doctor
+          command: flutter doctor -v
+      - restore_cache:
+          key: bundle-v1-{{ checksum "android/Gemfile" }}-{{ arch }}
+      - run:
+          command: bundle install
+          working_directory: android
+      - save_cache:
+          key: bundle-v1-{{ checksum "android/Gemfile" }}-{{ arch }}
+          paths:
+            - vendor/bundle
+      - run:
+          name: Removing .gradle dir
+          command: sudo rm -rf android/.gradle
+      - run:
+          name: Setup Environment Variables
+          working_directory: android
+          command: ./ci_environment_setup.sh copyEnvVarsToGradleProperties
+      - run:
+          name: Build Android APK
+          command: flutter build apk --flavor uat
+      - run:
+          name: Copy Android artifacts
+          command: |
+            mkdir -p build_results/android
+            cp -r build/app/outputs/apk/uat/release build_results/android
+      - store_artifacts:
+          path: build_results/android
+      - store_test_results:
+          path: build_results/android
+
+  android_distribute_prod:
+    docker:
+      - image: cirrusci/flutter
+    working_directory: ~/flutter-app
+    steps:
+      - checkout:
+          path: ~/flutter-app
+      - run: flutter pub get
+      - run:
+      
+  flutter_unit_tests:
     docker:
       - image: cirrusci/flutter
     steps:
       - checkout
-      - run:
-          name: "Flutter Doctor"
-          command: "flutter doctor"
-      - run:
-          name: "Testing"
-          command: "flutter test"
-      - run:
-          name: "Build Android"
-          command: "flutter -v build apk"
-#      - run: flutter doctor
-#      - run: flutter test
-#      - run: flutter -v build apk
-#      - run: flutter -v build ios
+      - run: flutter doctor
+      - run: pub get
+      - run: flutter test --coverage
+
+workflows:
+  version: 2
+  build-test-deploy:
+    jobs:
+      - flutter_unit_tests
+      - android_distribute_beta:
+          requires:
+            - flutter_unit_tests
+          filters:
+            branches:
+              only: distribute_beta
+      - ios_distribute_beta:
+          requires:
+            - flutter_unit_tests
+          filters:
+            branches:
+              only: distribute_beta
+      - android_distribute_prod:
+          requires:
+            - flutter_unit_tests
+          filters:
+            branches:
+              only: distribute_prod
+      - ios_distribute_prod:
+          requires:
+            - flutter_unit_tests
+          filters:
+            branches:
+              only: distribute_prod
