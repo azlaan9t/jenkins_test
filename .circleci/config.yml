@@ -5,12 +5,24 @@ jobs:
       - image: cirrusci/flutter
     steps:
       - checkout
+      - run:
+          name: "Flutter Doctor"
+          command: "flutter doctor"
+      - run:
+          name: "Pub Get"
+          command: "flutter pub get"
 
   ios_job:
     macos:
       xcode: 12.5.1
     steps:
       - checkout
+      - run:
+          name: "Flutter Doctor"
+          command: "flutter doctor"
+      - run:
+          name: "Pub Get"
+          command: "flutter pub get"
 
   flutter_doctor:
     docker:
