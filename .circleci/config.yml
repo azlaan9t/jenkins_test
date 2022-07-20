@@ -24,10 +24,13 @@ jobs:
       - flutter/install_ios_gem
       - run:
           name: "Flutter Doctor"
-          command: "flutter doctor"
-      - run:
-          name: "Pub Get"
-          command: "flutter pub get"
+          command: "ls"
+#      - run:
+#          name: "Flutter Clean"
+#          command: "flutter clean"
+#      - run:
+#          name: "Pub Get"
+#          command: "flutter pub get"
 
   flutter_doctor:
     docker:
@@ -42,5 +45,4 @@ workflows:
   version: 2
   build-test-deploy:
     jobs:
-      - android_job
       - ios_job
