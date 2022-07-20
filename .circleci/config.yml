@@ -1,16 +1,6 @@
 version: 2
-machine:
-  environment:
-    ANDROID_HOME: "/usr/local/share/android-sdk"
-    ANDROID_SDK_HOME: "/usr/local/share/android-sdk"
-    ANDROID_SDK_ROOT: "/usr/local/share/android-sdk"
-dependencies:
-  override:
-    - brew tap caskroom/cask
-    - brew tap caskroom/versions
-    - brew cask install android-sdk
 jobs:
-  build:
+  android_job:
     docker:
       - image: cirrusci/flutter
     steps:
@@ -27,3 +17,11 @@ jobs:
       - run:
           name: "Build IOS"
           command: "flutter -v build ios"
+  ios_job:
+    macos:
+      xcode: 12.5.1
+    steps:
+      - checkout
+      - run:
+          name: "Flutter Doctor"
+          command: "flutter doctor"
