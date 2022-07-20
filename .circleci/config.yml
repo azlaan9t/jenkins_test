@@ -2,18 +2,20 @@ version: '2.1'
 orbs:
   flutter: circleci/flutter@1.0
 jobs:
-  distribute:
+  build:
     macos:
       xcode: 12.5.1
     steps:
-      - flutter/install_sdk_and_pub:
-          version: 2.2.3
-      - flutter/install_ios_pod
-      - flutter/install_ios_gem
+      - checkout
       - run:
           name: "Flutter Doctor"
           command: "flutter doctor"
-workflows:
-  distribute:
-    jobs:
-      - distribute
+      - run:
+          name: "Testing"
+          command: "flutter test"
+      - run:
+          name: "Build Android"
+          command: "flutter -v build apk"
+      - run:
+          name: "Build IOS"
+          command: "flutter -v build ios"
