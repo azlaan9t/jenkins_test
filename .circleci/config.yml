@@ -12,7 +12,7 @@ jobs:
       - flutter/install_ios_gem
       - run:
           name: "Flutter Doctor"
-          command: "flutter doctor
+          command: "flutter doctor"
 workflows:
   distribute:
     jobs:
