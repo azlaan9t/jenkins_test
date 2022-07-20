@@ -1,23 +1,18 @@
-version: 2
+version: '2.1'
+orbs:
+  flutter: circleci/flutter@1.0
 jobs:
-  build:
-    docker:
-      - image: cirrusci/flutter
+  distribute:
+    macos:
+      xcode: 12.5.1
     steps:
-      - checkout
+      - flutter/install_sdk_and_pub
+      - flutter/install_ios_pod
+      - flutter/install_ios_gem
       - run:
-          name: "Flutter Doctor"
-          command: "flutter doctor"
-      - run:
-          name: "Testing"
-          command: "flutter test"
-      - run:
-          name: "Build Android"
-          command: "flutter -v build apk"
-      - run:
-          name: "Build IOS"
-          command: "flutter -v build ios"
-#      - run: flutter doctor
-#      - run: flutter test
-#      - run: flutter -v build apk
-#      - run: flutter -v build ios
+          command: bundle exec fastlane distribute
+          working_directory: ios
+workflows:
+  distribute:
+    jobs:
+      - distribute
