@@ -1,7 +1,7 @@
 version: 2.1
 orbs:
   android: circleci/android@1.0.3
-  flutter: circleci/flutter@1.0
+  flutter: circleci/flutter@1.1.0
 jobs:
   android_job:
     docker:
@@ -22,7 +22,8 @@ jobs:
     macos:
       xcode: 13.3.1
     steps:
-      - flutter/install_sdk
+      - flutter/install_sdk:
+          version: "3.0.1"
       - checkout
 
 
