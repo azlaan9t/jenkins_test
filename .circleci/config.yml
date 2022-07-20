@@ -15,8 +15,26 @@ jobs:
     steps:
       - checkout
       - run:
-          name: "Say hello"
-          command: "echo Hello, World!"
+          name: "Install Fvm"
+          command: "fvm install 3.0.1"
+      - run:
+          name: "Fvm Use"
+          command: "fvm use 3.0.1"
+      - run:
+          name: "Flutter precache"
+          command: "fvm flutter precache"
+      - run:
+          name: "Flutter doctor"
+          command: "fvm flutter doctor -v"
+      - run:
+          name: "TEST"
+          command: "fvm flutter test"
+      - run:
+          name: "Build"
+          command: '''
+                  #!/bin/sh
+                  fvm flutter build apk --debug
+                  '''
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
