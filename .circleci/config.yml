@@ -5,23 +5,35 @@ jobs:
       - image: cirrusci/flutter
     steps:
       - checkout
-      - run:
-          name: "Flutter Doctor"
-          command: "flutter doctor"
-      - run:
-          name: "Testing"
-          command: "flutter test"
-      - run:
-          name: "Build Android"
-          command: "flutter -v build apk"
-      - run:
-          name: "Build IOS"
-          command: "flutter -v build ios"
+
   ios_job:
     macos:
       xcode: 12.5.1
     steps:
       - checkout
-      - run:
-          name: "Flutter Doctor"
-          command: "flutter doctor"
+
+  flutter_doctor:
+    docker:
+      - image: cirrusci/flutter
+    steps:
+      - checkout
+      - run: flutter doctor
+      - run: pub get
+      - run: flutter test --coverage
+
+workflows:
+  version: 2
+  build-test-deploy:
+    jobs:
+      - android_job:
+          requires:
+            - flutter_doctor
+          filters:
+            branches:
+              only: main
+      - ios_job:
+          requires:
+            - flutter_doctor
+          filters:
+            branches:
+              only: main
