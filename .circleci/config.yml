@@ -1,12 +1,22 @@
 version: 2.1
 orbs:
   flutter: circleci/flutter@1.1.0
+  ruby: circleci/ruby@1.2.0
 jobs:
   android_job:
     docker:
       - image: cirrusci/flutter
+    working_directory: /Users/distiller/jenkins_test
+    environment:
+      FL_OUTPUT_DIR: output
+      FASTLANE_LANE: playstore
+    shell: /bin/bash --login -o pipefail
     steps:
       - checkout
+      - ruby/install-deps
+      - run:
+          name: "Install Fastlane"
+          command: "gem install fastlane"
       - run:
           name: "Flutter Doctor"
           command: "flutter doctor"
@@ -16,6 +26,13 @@ jobs:
       - run:
           name: "Flutter build Android"
           command: "flutter build apk --debug"
+      - run:
+          name: fastlane
+          command: bundle exec fastlane $FASTLANE_LANE
+      - store_artifacts:
+          path: output
+      - store_test_results:
+          path: output/scan
 
   ios_job:
     macos:
@@ -25,19 +42,8 @@ jobs:
           version: "3.0.1"
       - checkout
 
-
-  flutter_doctor:
-    docker:
-      - image: cirrusci/flutter
-    steps:
-      - checkout
-      - run: flutter doctor
-      - run: flutter pub get
-      - run: flutter test --coverage
-
 workflows:
   version: 2
   build-test-deploy:
     jobs:
-      - ios_job
       - android_job
